@@ -91,12 +91,12 @@
                   </v-list-tile-title>
                   <v-list-tile-sub-title>
                           <v-layout row wrap>
-                    <v-flex xs2> <p>Price USD: {{  coin.price_usd }} </p></v-flex>
-                    <v-flex xs2> <p>Price BTC: {{  coin.price_btc }} </p></v-flex>
-                    <v-flex xs2><p><v-icon v-if="coin.percent_change_24h > 0" color="teal">arrow_upward</v-icon>
+                    <v-flex lg2> <p>Price USD: {{  coin.price_usd }} </p></v-flex>
+                    <v-flex lg2> <p>Price BTC: {{  coin.price_btc }} </p></v-flex>
+                    <v-flex lg2><p><v-icon v-if="coin.percent_change_24h > 0" color="teal">arrow_upward</v-icon>
                       <v-icon v-else color="red"> arrow_downward</v-icon>  
                     Change 24h: {{  coin.percent_change_24h }}%</p></v-flex>
-                    <v-flex xs2><p><v-icon v-if="coin.percent_change_7d > 0" color="teal">arrow_upward</v-icon>
+                    <v-flex lg2><p><v-icon v-if="coin.percent_change_7d > 0" color="teal">arrow_upward</v-icon>
                       <v-icon v-else color="red"> arrow_downward</v-icon>  
                     Change 7d: {{  coin.percent_change_7d }}%</p></v-flex>
                   </v-layout>
@@ -110,33 +110,50 @@
             </template>
           </v-list>
         </v-card>
+    <v-layout  v-else>
+      <v-flex>
+                <v-card>
+          <v-card-media style="padding0:-20px; margin-top: 20px;">
 
         <trend
-  :data="[0, 2, 5, 9, 5, 10, 3, 5, 0, 0, 1, 8, 2, 9, 0]"
+  :data="this.histData"
   :gradient="['#6fa8dc', '#42b983', '#2c3e50']"
   auto-draw
-  smooth
-  v-else>
+  :width="1400" :height="500"
+  smooth>
 </trend>
+          </v-card-media>
+          <v-card-title primary-title>
+            <div>
+              <h3 class="headline mb-0">Pulse Graph for Bitcoin</h3>
+              <div>This graph shows Bitcoin value over USD in given spesific time.</div>
+            </div>
+          </v-card-title>
+        </v-card>
+      </v-flex>
+    </v-layout>
       </v-flex>
     </v-layout>
    </v-app>
 </template>
 <script>
    import axios from 'axios';
-   
+   import jQuery from 'jquery';
+   import chartjs from 'chart.js';
 
    // APIurl = 'http://jsonplaceholder.typicode.com/posts';
    const APIurl  = 'https://api.coinmarketcap.com/v1/ticker/?convert=USD&limit=50';
    const statURL = 'https://api.coinmarketcap.com/v1/global/';
-   const BTCHist = 'http://api.coindesk.com/v1/bpi/historical/close.json?start=2013-09-01&end=';
+   const BTCHist = 'https://api.coindesk.com/v1/bpi/historical/close.json?start=2015-09-01&end=';
+   const BTCAll = 'https://api.coindesk.com/v1/bpi/historical/close.json';
    export default {
    data() {
    return {
    coins: [],
    stats: [],
    histData: [],
-   bgColor: 'dark',//'#21253d',
+   ctx: document.getElementById('GraphArea'),
+   bgColor: '#424242',//'#21253d',
    e2: 0
    }
    },
@@ -164,8 +181,6 @@
       false;
    }
    },
-   
-   // Fetches posts when the component is created.
    created() {
    axios.get(APIurl)
    .then(response => {
@@ -188,27 +203,12 @@
    if(tmp < 10) tmp = '0' +tmp + '-'; 
    todayDate +=  tmp; 
 
-   axios.get(BTCHist+todayDate, {
-    headers: {
-      'Access-Control-Allow-Origin': '*',
-      'Accept': 'application/json',
-      'Content-Type': 'application/json'
-    },
-     Accept: 'application/json',
-   })
+axios.get(BTCHist+todayDate)
    .then(response => {
-   // JSON responses are automatically parsed.
-   this.histData = response.data
+   var respData = response.data;
+               var array = Object.values(respData.bpi);
+               this.histData = array;
    });
-
-   // async / await version (created() becomes async created())
-   //
-   // try {
-   //   const response = await axios.get(`http://jsonplaceholder.typicode.com/posts`)
-   //   this.posts = response.data
-   // } catch (e) {
-   //   this.errors.push(e)
-   // }
    }
    }
 </script>
