@@ -9,7 +9,9 @@ import('vuetify/dist/vuetify.min.css')
 Vue.use(Vuetify)
 Vue.use(Trend)
 Vue.config.productionTip = false
-
+import $ from 'jquery';
+window.jQuery = $;
+window.$ = $;
 /* eslint-disable no-new */
 new Vue({
   el: '#app',
